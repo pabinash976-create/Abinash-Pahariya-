@@ -1,0 +1,6 @@
+{
+  "name": "Wolf Study",
+  "description": "Personal dark-navy study companion with 7 subjects, PDF library, notes, diary, timetable, task manager, OCR book scanner, backup/restore, and trilingual AI study assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

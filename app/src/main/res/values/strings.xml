@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Wolf Study</string>
+    <string name="brand_title">WOLF STUDY</string>
+    <string name="brand_motto">I\'M HUNGRY. GIVE ME MORE.</string>
+    <string name="brand_tagline">STUDY SMART. STAY HUNGRY.</string>
+    <string name="cd_wolf_logo">Wolf Study emblem logo</string>
+    <string name="cd_back">Navigate back</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_bookmark">Toggle bookmark</string>
+    <string name="cd_delete">Delete item</string>
+    <string name="cd_edit">Edit item</string>
+    <string name="cd_add">Add item</string>
+    <string name="cd_settings">Open settings</string>
+</resources>
