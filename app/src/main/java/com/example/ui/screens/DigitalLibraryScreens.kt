@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +64,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -133,11 +135,25 @@ fun DigitalLibraryScreen(
                 .testTag("digital_library_screen")
         ) {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text(
-                    text = "DIGITAL LIBRARY",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "DIGITAL LIBRARY",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    OutlinedButton(
+                        onClick = { pdfPickerLauncher.launch(arrayOf("application/pdf")) },
+                        modifier = Modifier.testTag("library_browse_device_button")
+                    ) {
+                        Icon(Icons.Default.UploadFile, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Browse PDF")
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 WolfSearchBar(
                     query = searchQuery,
@@ -415,16 +431,22 @@ fun PdfReaderScreen(
         mutableIntStateOf(initialPage.coerceIn(0, (book.pageCount - 1).coerceAtLeast(0)))
     }
     var zoomScale by remember { mutableFloatStateOf(1f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
     var renderedBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var renderError by remember { mutableStateOf<String?>(null) }
     var isLoadingPage by remember { mutableStateOf(true) }
     var showBookmarkLabelDialog by remember { mutableStateOf(false) }
+    var showPageJumpDialog by remember { mutableStateOf(false) }
 
-    val isPageBookmarked = pageBookmarks.any { it.bookId == book.id && it.pageNumber == currentPage }
+    val bookBookmarks = pageBookmarks.filter { it.bookId == book.id }
+    val isPageBookmarked = bookBookmarks.any { it.pageNumber == currentPage }
 
     LaunchedEffect(book.id, currentPage) {
         isLoadingPage = true
         renderError = null
+        offsetX = 0f
+        offsetY = 0f
         onPageChanged(book.id, currentPage)
         renderPage(book.localPath, currentPage, 1440)
             .onSuccess { bmp ->
@@ -485,10 +507,20 @@ fun PdfReaderScreen(
                         ) {
                             Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous page")
                         }
-                        Text(
-                            text = "${currentPage + 1} / ${book.pageCount}",
-                            style = MaterialTheme.typography.labelLarge
-                        )
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small,
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.small)
+                                .clickable { showPageJumpDialog = true }
+                                .testTag("pdf_page_jump_button")
+                        ) {
+                            Text(
+                                text = "${currentPage + 1} / ${book.pageCount}",
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                            )
+                        }
                         IconButton(
                             onClick = { if (currentPage + 1 < book.pageCount) currentPage++ },
                             enabled = currentPage + 1 < book.pageCount,
@@ -500,14 +532,28 @@ fun PdfReaderScreen(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(
-                            onClick = { zoomScale = (zoomScale - 0.25f).coerceIn(1f, 3f) },
+                            onClick = {
+                                zoomScale = (zoomScale - 0.25f).coerceIn(1f, 3f)
+                                if (zoomScale <= 1f) {
+                                    offsetX = 0f
+                                    offsetY = 0f
+                                }
+                            },
                             modifier = Modifier.minimumInteractiveComponentSize()
                         ) {
                             Icon(Icons.Default.ZoomOut, contentDescription = "Zoom out")
                         }
                         Text(
                             text = "${(zoomScale * 100).toInt()}%",
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.small)
+                                .clickable {
+                                    zoomScale = 1f
+                                    offsetX = 0f
+                                    offsetY = 0f
+                                }
+                                .padding(horizontal = 6.dp, vertical = 4.dp)
                         )
                         IconButton(
                             onClick = { zoomScale = (zoomScale + 0.25f).coerceIn(1f, 3f) },
@@ -526,8 +572,16 @@ fun PdfReaderScreen(
                 .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background)
                 .pointerInput(Unit) {
-                    detectTransformGestures { _, _, zoom, _ ->
-                        zoomScale = (zoomScale * zoom).coerceIn(1f, 3f)
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        val nextZoom = (zoomScale * zoom).coerceIn(1f, 3f)
+                        zoomScale = nextZoom
+                        if (nextZoom > 1f) {
+                            offsetX += pan.x
+                            offsetY += pan.y
+                        } else {
+                            offsetX = 0f
+                            offsetY = 0f
+                        }
                     }
                 }
                 .testTag("pdf_reader_screen"),
@@ -546,11 +600,66 @@ fun PdfReaderScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(8.dp)
-                        .graphicsLayer(scaleX = zoomScale, scaleY = zoomScale),
+                        .graphicsLayer(
+                            scaleX = zoomScale,
+                            scaleY = zoomScale,
+                            translationX = offsetX,
+                            translationY = offsetY
+                        ),
                     contentScale = ContentScale.Fit
                 )
             }
         }
+    }
+
+    if (showPageJumpDialog) {
+        var pageInput by remember { mutableStateOf("${currentPage + 1}") }
+        AlertDialog(
+            onDismissRequest = { showPageJumpDialog = false },
+            title = { Text("Go to Page (1 - ${book.pageCount})") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = pageInput,
+                        onValueChange = { pageInput = it.filter { ch -> ch.isDigit() } },
+                        label = { Text("Page Number") },
+                        singleLine = true
+                    )
+                    if (bookBookmarks.isNotEmpty()) {
+                        Text(
+                            text = "Bookmarked Pages",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        bookBookmarks.take(5).forEach { bm ->
+                            OutlinedButton(
+                                onClick = {
+                                    currentPage = bm.pageNumber.coerceIn(0, (book.pageCount - 1).coerceAtLeast(0))
+                                    showPageJumpDialog = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.Bookmark, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Page ${bm.pageNumber + 1}: ${bm.noteLabel}", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    val requested = pageInput.toIntOrNull()
+                    if (requested != null) {
+                        currentPage = (requested - 1).coerceIn(0, (book.pageCount - 1).coerceAtLeast(0))
+                    }
+                    showPageJumpDialog = false
+                }) { Text("Go") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPageJumpDialog = false }) { Text("Cancel") }
+            }
+        )
     }
 
     if (showBookmarkLabelDialog) {
