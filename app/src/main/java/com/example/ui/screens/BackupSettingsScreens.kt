@@ -25,8 +25,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
@@ -321,14 +323,50 @@ fun SettingsScreen(
                     Text("APPEARANCE & PREMIUM COLORS", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
+
+                // Quick Dark / Light Mode Selector
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = preferences.darkThemeEnabled,
+                        onClick = { onSetDarkTheme(true) },
+                        leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                        label = { Text("Dark Luxury") },
+                        modifier = Modifier.weight(1f).testTag("settings_mode_dark")
+                    )
+                    FilterChip(
+                        selected = !preferences.darkThemeEnabled,
+                        onClick = { onSetDarkTheme(false) },
+                        leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                        label = { Text("Light Colour") },
+                        modifier = Modifier.weight(1f).testTag("settings_mode_light")
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val isLightMode = !preferences.darkThemeEnabled
                     WolfThemePreset.entries.forEach { preset ->
                         val isSelected = preferences.themePreset == preset
+                        val showLightPreview = isLightMode || preset.prefersLightMode
+                        val canvasSwatch = if (showLightPreview) preset.lightPreviewCanvas else preset.previewCanvas
+                        val surfaceSwatch = if (showLightPreview) preset.lightPreviewSurface else preset.previewSurface
+                        val accentSwatch = if (showLightPreview) preset.lightPreviewAccent else preset.previewAccent
+                        val subtitleText = if (showLightPreview) preset.lightSubtitle else preset.subtitle
+
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(MaterialTheme.shapes.small)
-                                .clickable { onSetThemePreset(preset) }
+                                .clickable {
+                                    onSetThemePreset(preset)
+                                    if (preset.prefersLightMode && preferences.darkThemeEnabled) {
+                                        onSetDarkTheme(false)
+                                    }
+                                }
                                 .testTag("settings_preset_${preset.name.lowercase()}"),
                             shape = MaterialTheme.shapes.small,
                             color = MaterialTheme.colorScheme.surface,
@@ -348,21 +386,21 @@ fun SettingsScreen(
                                             modifier = Modifier
                                                 .size(22.dp)
                                                 .clip(CircleShape)
-                                                .background(preset.previewCanvas)
+                                                .background(canvasSwatch)
                                                 .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                                         )
                                         Box(
                                             modifier = Modifier
                                                 .size(22.dp)
                                                 .clip(CircleShape)
-                                                .background(preset.previewSurface)
+                                                .background(surfaceSwatch)
                                                 .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                                         )
                                         Box(
                                             modifier = Modifier
                                                 .size(22.dp)
                                                 .clip(CircleShape)
-                                                .background(preset.previewAccent)
+                                                .background(accentSwatch)
                                                 .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
                                         )
                                     }
@@ -370,7 +408,7 @@ fun SettingsScreen(
                                     Column {
                                         Text(preset.displayName, style = MaterialTheme.typography.titleSmall)
                                         Text(
-                                            text = preset.subtitle,
+                                            text = subtitleText,
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -397,7 +435,7 @@ fun SettingsScreen(
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text("Dark Mode", style = MaterialTheme.typography.titleMedium)
-                        Text("Toggle between Deep Dark & Light Academic mode", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Switch anytime between Dark Navy & Light Colour palettes", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(
                         checked = preferences.darkThemeEnabled,

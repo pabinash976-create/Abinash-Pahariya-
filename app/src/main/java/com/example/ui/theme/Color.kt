@@ -55,7 +55,7 @@ val EmeraldSuccess = Color(0xFF34D399)
 val AmberWarning = Color(0xFFFBBF24)
 val CoralError = Color(0xFFF87171)
 
-// Light Academic Contrast Palette (Porcelain + Navy + Burnished Gold)
+// Light Academic & Luxury Light Color Palettes
 val LightAcademicBg = Color(0xFFF3F6FB)
 val LightAcademicSurface = Color(0xFFFFFFFF)
 val LightAcademicSurfaceVariant = Color(0xFFE8EEF7)
@@ -63,3 +63,36 @@ val LightAcademicText = Color(0xFF0B192E)
 val LightAcademicMuted = Color(0xFF475A78)
 val LightAcademicOutline = Color(0xFFC5D0E0)
 val LightGoldPrimary = Color(0xFF9C7912)
+
+// Ivory Gold Light Palette
+val IvoryBg = Color(0xFFFAF7F0)
+val IvorySurface = Color(0xFFFFFDF9)
+val IvorySurfaceVariant = Color(0xFFF2ECE0)
+val IvoryHigh = Color(0xFFE7DEC9)
+val IvoryOutline = Color(0xFFD4C8AD)
+val IvoryText = Color(0xFF1F1A10)
+val IvoryGoldAccent = Color(0xFF9E700B)
+
+// Sky Titanium Light Palette
+val SkyBg = Color(0xFFF0F7FC)
+val SkySurface = Color(0xFFFFFFFF)
+val SkySurfaceVariant = Color(0xFFE1EFFA)
+val SkyHigh = Color(0xFFD0E5F5)
+val SkyOutline = Color(0xFFB3CFE6)
+val SkyAccent = Color(0xFF0369A1)
+
+// Mint Scholar Light Palette
+val MintBg = Color(0xFFF0F9F6)
+val MintSurface = Color(0xFFFFFFFF)
+val MintSurfaceVariant = Color(0xFFE0F2EC)
+val MintHigh = Color(0xFFCCE8DE)
+val MintOutline = Color(0xFFAAD3C5)
+val MintAccent = Color(0xFF047857)
+
+// Platinum Silver Light Palette
+val PlatinumBg = Color(0xFFF4F5FA)
+val PlatinumSurface = Color(0xFFFFFFFF)
+val PlatinumSurfaceVariant = Color(0xFFE7EAF5)
+val PlatinumHigh = Color(0xFFD8DDF0)
+val PlatinumOutline = Color(0xFFC0C7DF)
+val PlatinumAccent = Color(0xFF28458E)

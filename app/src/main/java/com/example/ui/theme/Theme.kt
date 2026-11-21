@@ -17,37 +17,82 @@ import androidx.core.view.WindowCompat
 enum class WolfThemePreset(
     val displayName: String,
     val subtitle: String,
+    val lightSubtitle: String,
     val previewCanvas: Color,
     val previewSurface: Color,
-    val previewAccent: Color
+    val previewAccent: Color,
+    val lightPreviewCanvas: Color,
+    val lightPreviewSurface: Color,
+    val lightPreviewAccent: Color,
+    val prefersLightMode: Boolean = false
 ) {
     MIDNIGHT_WOLF(
         displayName = "Midnight Wolf",
         subtitle = "Navy, Silver & Gold",
+        lightSubtitle = "Porcelain White, Navy & Gold",
         previewCanvas = DeepMidnightNavy,
         previewSurface = NavySurfaceElevated,
-        previewAccent = BrightGold
+        previewAccent = BrightGold,
+        lightPreviewCanvas = LightAcademicBg,
+        lightPreviewSurface = LightAcademicSurfaceVariant,
+        lightPreviewAccent = NavySurfaceHigh
     ),
     OBSIDIAN_GOLD(
         displayName = "Obsidian Gold",
         subtitle = "Obsidian, Platinum & Gold",
+        lightSubtitle = "Warm Ivory, Cream & Sovereign Gold",
         previewCanvas = ObsidianBg,
         previewSurface = ObsidianElevated,
-        previewAccent = ChampagneGold
+        previewAccent = ChampagneGold,
+        lightPreviewCanvas = IvoryBg,
+        lightPreviewSurface = IvorySurfaceVariant,
+        lightPreviewAccent = IvoryGoldAccent
     ),
     ARCTIC_TITANIUM(
         displayName = "Arctic Titanium",
         subtitle = "Steel Navy & Ice Silver",
+        lightSubtitle = "Glacier Sky, Ice White & Sapphire",
         previewCanvas = ArcticBg,
         previewSurface = ArcticElevated,
-        previewAccent = TitaniumCyan
+        previewAccent = TitaniumCyan,
+        lightPreviewCanvas = SkyBg,
+        lightPreviewSurface = SkySurfaceVariant,
+        lightPreviewAccent = SkyAccent
     ),
     EMERALD_SCHOLAR(
         displayName = "Emerald Scholar",
         subtitle = "Forest Navy & Emerald",
+        lightSubtitle = "Soft Mint, Parchment & Jade",
         previewCanvas = EmeraldBg,
         previewSurface = EmeraldElevated,
-        previewAccent = EmeraldSuccess
+        previewAccent = EmeraldSuccess,
+        lightPreviewCanvas = MintBg,
+        lightPreviewSurface = MintSurfaceVariant,
+        lightPreviewAccent = MintAccent
+    ),
+    PEARL_IVORY(
+        displayName = "Pearl Ivory (Light)",
+        subtitle = "Warm Cream, Pearl & Bronze Gold",
+        lightSubtitle = "Warm Cream, Pearl & Bronze Gold",
+        previewCanvas = Color(0xFF1D1810),
+        previewSurface = Color(0xFF2D2518),
+        previewAccent = BrightGold,
+        lightPreviewCanvas = IvoryBg,
+        lightPreviewSurface = IvoryHigh,
+        lightPreviewAccent = IvoryGoldAccent,
+        prefersLightMode = true
+    ),
+    PLATINUM_SKY(
+        displayName = "Platinum Sky (Light)",
+        subtitle = "Crisp Platinum, Silver & Royal Blue",
+        lightSubtitle = "Crisp Platinum, Silver & Royal Blue",
+        previewCanvas = Color(0xFF12192E),
+        previewSurface = Color(0xFF1F2B4D),
+        previewAccent = TitaniumCyan,
+        lightPreviewCanvas = PlatinumBg,
+        lightPreviewSurface = PlatinumHigh,
+        lightPreviewAccent = PlatinumAccent,
+        prefersLightMode = true
     )
 }
 
@@ -171,15 +216,63 @@ private val EmeraldScholarDarkScheme = darkColorScheme(
     onError = EmeraldBg
 )
 
-private fun lightSchemeForPreset(preset: WolfThemePreset): ColorScheme {
-    val accent = when (preset) {
-        WolfThemePreset.MIDNIGHT_WOLF -> NavySurfaceHigh
-        WolfThemePreset.OBSIDIAN_GOLD -> Color(0xFF181E2E)
-        WolfThemePreset.ARCTIC_TITANIUM -> Color(0xFF0C4A6E)
-        WolfThemePreset.EMERALD_SCHOLAR -> Color(0xFF065F46)
-    }
-    return lightColorScheme(
-        primary = accent,
+private val PearlIvoryDarkScheme = darkColorScheme(
+    primary = BrightGold,
+    onPrimary = OnGold,
+    primaryContainer = GoldContainer,
+    onPrimaryContainer = BrightGold,
+    secondary = Color(0xFFE5DAC1),
+    onSecondary = Color(0xFF1D1810),
+    secondaryContainer = Color(0xFF332B1D),
+    onSecondaryContainer = CrispWhite,
+    tertiary = BurnishedGold,
+    onTertiary = OnGold,
+    background = Color(0xFF17130C),
+    onBackground = CrispWhite,
+    surface = Color(0xFF211C13),
+    onSurface = CrispWhite,
+    surfaceVariant = Color(0xFF2B2418),
+    onSurfaceVariant = Color(0xFFD8CEB8),
+    surfaceContainerLowest = Color(0xFF17130C),
+    surfaceContainerLow = Color(0xFF211C13),
+    surfaceContainer = Color(0xFF2B2418),
+    surfaceContainerHigh = Color(0xFF382F20),
+    surfaceContainerHighest = Color(0xFF453B29),
+    outline = Color(0xFF5C4E37),
+    error = CoralError,
+    onError = Color(0xFF17130C)
+)
+
+private val PlatinumSkyDarkScheme = darkColorScheme(
+    primary = TitaniumCyan,
+    onPrimary = OnTitanium,
+    primaryContainer = TitaniumContainer,
+    onPrimaryContainer = TitaniumCyan,
+    secondary = PlatinumSilver,
+    onSecondary = Color(0xFF0D1426),
+    secondaryContainer = Color(0xFF212E52),
+    onSecondaryContainer = CrispWhite,
+    tertiary = BrightGold,
+    onTertiary = OnGold,
+    background = Color(0xFF0B1122),
+    onBackground = CrispWhite,
+    surface = Color(0xFF121B33),
+    onSurface = CrispWhite,
+    surfaceVariant = Color(0xFF1A2545),
+    onSurfaceVariant = PlatinumSilver,
+    surfaceContainerLowest = Color(0xFF0B1122),
+    surfaceContainerLow = Color(0xFF121B33),
+    surfaceContainer = Color(0xFF1A2545),
+    surfaceContainerHigh = Color(0xFF223059),
+    surfaceContainerHighest = Color(0xFF2B3C6E),
+    outline = Color(0xFF3B4F8A),
+    error = CoralError,
+    onError = Color(0xFF0B1122)
+)
+
+private fun lightSchemeForPreset(preset: WolfThemePreset): ColorScheme = when (preset) {
+    WolfThemePreset.MIDNIGHT_WOLF -> lightColorScheme(
+        primary = NavySurfaceHigh,
         onPrimary = CrispWhite,
         primaryContainer = Color(0xFFFFF0C2),
         onPrimaryContainer = Color(0xFF3E2D00),
@@ -205,6 +298,119 @@ private fun lightSchemeForPreset(preset: WolfThemePreset): ColorScheme {
         error = Color(0xFFDC2626),
         onError = CrispWhite
     )
+
+    WolfThemePreset.OBSIDIAN_GOLD,
+    WolfThemePreset.PEARL_IVORY -> lightColorScheme(
+        primary = IvoryGoldAccent,
+        onPrimary = CrispWhite,
+        primaryContainer = Color(0xFFFCEFC7),
+        onPrimaryContainer = Color(0xFF3D2A00),
+        secondary = Color(0xFF5A4E38),
+        onSecondary = CrispWhite,
+        secondaryContainer = IvorySurfaceVariant,
+        onSecondaryContainer = IvoryText,
+        tertiary = BurnishedGold,
+        onTertiary = OnGold,
+        background = IvoryBg,
+        onBackground = IvoryText,
+        surface = IvorySurface,
+        onSurface = IvoryText,
+        surfaceVariant = IvorySurfaceVariant,
+        onSurfaceVariant = Color(0xFF5F5542),
+        surfaceContainerLowest = IvorySurface,
+        surfaceContainerLow = IvoryBg,
+        surfaceContainer = IvorySurfaceVariant,
+        surfaceContainerHigh = IvoryHigh,
+        surfaceContainerHighest = Color(0xFFDDD1B8),
+        outline = IvoryOutline,
+        outlineVariant = Color(0xFFE5DCC8),
+        error = Color(0xFFDC2626),
+        onError = CrispWhite
+    )
+
+    WolfThemePreset.ARCTIC_TITANIUM -> lightColorScheme(
+        primary = SkyAccent,
+        onPrimary = CrispWhite,
+        primaryContainer = Color(0xFFD6EEFF),
+        onPrimaryContainer = Color(0xFF062E4A),
+        secondary = Color(0xFF335C7D),
+        onSecondary = CrispWhite,
+        secondaryContainer = SkySurfaceVariant,
+        onSecondaryContainer = Color(0xFF0A2236),
+        tertiary = BurnishedGold,
+        onTertiary = OnGold,
+        background = SkyBg,
+        onBackground = Color(0xFF0A2236),
+        surface = SkySurface,
+        onSurface = Color(0xFF0A2236),
+        surfaceVariant = SkySurfaceVariant,
+        onSurfaceVariant = Color(0xFF3C5C78),
+        surfaceContainerLowest = SkySurface,
+        surfaceContainerLow = SkyBg,
+        surfaceContainer = SkySurfaceVariant,
+        surfaceContainerHigh = SkyHigh,
+        surfaceContainerHighest = Color(0xFFC0DCEF),
+        outline = SkyOutline,
+        outlineVariant = Color(0xFFD7E8F5),
+        error = Color(0xFFDC2626),
+        onError = CrispWhite
+    )
+
+    WolfThemePreset.EMERALD_SCHOLAR -> lightColorScheme(
+        primary = MintAccent,
+        onPrimary = CrispWhite,
+        primaryContainer = Color(0xFFD1FAE5),
+        onPrimaryContainer = Color(0xFF023B29),
+        secondary = Color(0xFF386656),
+        onSecondary = CrispWhite,
+        secondaryContainer = MintSurfaceVariant,
+        onSecondaryContainer = Color(0xFF06291E),
+        tertiary = LightGoldPrimary,
+        onTertiary = CrispWhite,
+        background = MintBg,
+        onBackground = Color(0xFF06291E),
+        surface = MintSurface,
+        onSurface = Color(0xFF06291E),
+        surfaceVariant = MintSurfaceVariant,
+        onSurfaceVariant = Color(0xFF365E51),
+        surfaceContainerLowest = MintSurface,
+        surfaceContainerLow = MintBg,
+        surfaceContainer = MintSurfaceVariant,
+        surfaceContainerHigh = MintHigh,
+        surfaceContainerHighest = Color(0xFFB7DDD0),
+        outline = MintOutline,
+        outlineVariant = Color(0xFFD3ECE3),
+        error = Color(0xFFDC2626),
+        onError = CrispWhite
+    )
+
+    WolfThemePreset.PLATINUM_SKY -> lightColorScheme(
+        primary = PlatinumAccent,
+        onPrimary = CrispWhite,
+        primaryContainer = Color(0xFFDFE6FF),
+        onPrimaryContainer = Color(0xFF102052),
+        secondary = Color(0xFF536185),
+        onSecondary = CrispWhite,
+        secondaryContainer = PlatinumSurfaceVariant,
+        onSecondaryContainer = Color(0xFF11182E),
+        tertiary = LightGoldPrimary,
+        onTertiary = CrispWhite,
+        background = PlatinumBg,
+        onBackground = Color(0xFF11182E),
+        surface = PlatinumSurface,
+        onSurface = Color(0xFF11182E),
+        surfaceVariant = PlatinumSurfaceVariant,
+        onSurfaceVariant = Color(0xFF4C5775),
+        surfaceContainerLowest = PlatinumSurface,
+        surfaceContainerLow = PlatinumBg,
+        surfaceContainer = PlatinumSurfaceVariant,
+        surfaceContainerHigh = PlatinumHigh,
+        surfaceContainerHighest = Color(0xFFC8D0EA),
+        outline = PlatinumOutline,
+        outlineVariant = Color(0xFFDCE1F0),
+        error = Color(0xFFDC2626),
+        onError = CrispWhite
+    )
 }
 
 val WolfStudyShapes = Shapes(
@@ -227,6 +433,8 @@ fun WolfStudyTheme(
             WolfThemePreset.OBSIDIAN_GOLD -> ObsidianGoldDarkScheme
             WolfThemePreset.ARCTIC_TITANIUM -> ArcticTitaniumDarkScheme
             WolfThemePreset.EMERALD_SCHOLAR -> EmeraldScholarDarkScheme
+            WolfThemePreset.PEARL_IVORY -> PearlIvoryDarkScheme
+            WolfThemePreset.PLATINUM_SKY -> PlatinumSkyDarkScheme
         }
     } else {
         lightSchemeForPreset(preset)
